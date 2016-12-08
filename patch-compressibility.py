@@ -20,7 +20,7 @@ def get_cpv(portdb):
     cpv_list = list()
 
     for cp in portdb.cp_all(trees=[portdir]):
-        cpv_list.extend(portdb.cp_list(cp))
+        cpv_list.extend(portdb.cp_list(cp, mytree=portdir))
 
     return cpv_list
 
