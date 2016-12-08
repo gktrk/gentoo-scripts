@@ -106,7 +106,7 @@ def decompress_xz(s_path, d_path):
     os.system("xzcat -k {} > {}".format(s_path, d_path))
 
 def decompress_bz2(s_path, d_path):
-    os.system("bunzip2 < {} > {}".format(s_path, d_path))
+    os.system("bunzip2 -c {} > {}".format(s_path, d_path))
 
 def decompress_patch(s_path, d_path, ext):
     if ext == "xz":
