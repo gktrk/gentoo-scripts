@@ -6,18 +6,18 @@
 import portage
 import os, os.path
 import re
+import argparse
 
 verbose=False
 no_version=True
-portdir="/usr/portage"
 
 def get_portdb():
     return portage.portdb
 
-def get_cp_all(portdb):
+def get_cp_all(portdb, portdir):
     return portdb.cp_all(trees=[portdir]) 
 
-def get_cpv_all(portdb, cp):
+def get_cpv_all(portdb, portdir, cp):
     return portdb.cp_list(cp, mytree=portdir)
 
 def get_fetchmap(portdb, atom):
@@ -34,22 +34,33 @@ def filter_fetchmap(fetchmap, regex):
 
     return fetchmap
 
-def get_maintainers(atom):
+def get_maintainers(portdir, atom):
     metadata = os.path.join(portdir, atom, "metadata.xml")
     xml = portage.xml.metadata.MetaDataXML(metadata, None)
     return xml.maintainers()
 
+def parse_cmdline():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--portdir", type=str, default="/usr/portage",
+                        help="Path to the portdir")
+
+    return parser.parse_args()
+
 def main():
-    regex = re.compile(".*(code.google.com|googlecode.com).*")
     portdb = get_portdb()
-    cp_list = get_cp_all(portdb)
+    regex = re.compile(".*(code.google.com|googlecode.com).*")
+
+    args = parse_cmdline()
+    portdir = args.portdir
+    cp_list = get_cp_all(portdb, portdir)
 
     for cp in cp_list:
-        cpv_list = get_cpv_all(portdb, cp)
+        cpv_list = get_cpv_all(portdb, portdir, cp)
         for cpv in cpv_list:
             fetchmap = filter_fetchmap(get_fetchmap(portdb, cpv), regex)
             if (bool(fetchmap)):
-                maintainers = get_maintainers(cp)
+                maintainers = get_maintainers(portdir, cp)
                 s = ""
                 for m in maintainers:
                     s += m.email + " "
