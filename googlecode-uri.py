@@ -9,7 +9,6 @@ import re
 import argparse
 
 verbose=False
-no_version=True
 
 def get_portdb():
     return portage.portdb
@@ -44,6 +43,8 @@ def parse_cmdline():
 
     parser.add_argument("--portdir", type=str, default="/usr/portage",
                         help="Path to the portdir")
+    parser.add_argument("-n", "--no-version", action="store_true",
+                        help="Print results per package instead of per version")
 
     return parser.parse_args()
 
@@ -53,6 +54,7 @@ def main():
 
     args = parse_cmdline()
     portdir = args.portdir
+    no_version = args.no_version
     cp_list = get_cp_all(portdb, portdir)
 
     for cp in cp_list:
