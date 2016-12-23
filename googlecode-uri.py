@@ -5,10 +5,9 @@
 
 import portage
 import os, os.path
+import sys
 import re
 import argparse
-
-verbose=False
 
 def get_portdb():
     return portage.portdb
@@ -45,6 +44,10 @@ def parse_cmdline():
                         help="Path to the portdir")
     parser.add_argument("-n", "--no-version", action="store_true",
                         help="Print results per package instead of per version")
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="""
+                        Print results per package instead of per version.
+                        Negates '--no-version'""")
 
     return parser.parse_args()
 
@@ -55,8 +58,15 @@ def main():
     args = parse_cmdline()
     portdir = args.portdir
     no_version = args.no_version
-    cp_list = get_cp_all(portdb, portdir)
+    verbose = args.verbose
 
+    if verbose:
+        if no_version:
+            print("Option '--verbose' is given, ignoring '--no-version'",
+                  file=sys.stderr)
+            no_version = False
+
+    cp_list = get_cp_all(portdb, portdir)
     for cp in cp_list:
         cpv_list = get_cpv_all(portdb, portdir, cp)
         for cpv in cpv_list:
