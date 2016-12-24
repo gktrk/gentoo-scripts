@@ -48,6 +48,8 @@ def parse_cmdline():
                         help="""
                         Print results per package instead of per version.
                         Negates '--no-version'""")
+    parser.add_argument("-m", "--maintainer-email", type=str, default="",
+                        help="Filter packages by maintainer email")
 
     return parser.parse_args()
 
@@ -59,6 +61,7 @@ def main():
     portdir = args.portdir
     no_version = args.no_version
     verbose = args.verbose
+    maintainer_regex = re.compile(args.maintainer_email)
 
     if verbose:
         if no_version:
@@ -74,10 +77,16 @@ def main():
             if (bool(fetchmap)):
                 maintainers = get_maintainers(portdir, cp)
                 s = ""
+                maintainer_match = False
+
                 for m in maintainers:
+                    if maintainer_regex.match(m.email):
+                        maintainer_match = True
                     s += m.email + " "
-                if s == "":
-                    s = "maintainer-needed@gentoo.org"
+
+                if not maintainer_match:
+                    continue
+
                 if no_version:
                     print("{}: {}".format(cp, s))
                     break
