@@ -46,7 +46,7 @@ def parse_cmdline():
                         help="Print results per package instead of per version")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="""
-                        Print results per package instead of per version.
+                        Print the SRC_URI links as well.
                         Negates '--no-version'""")
     parser.add_argument("-m", "--maintainer-email", type=str, default="",
                         help="Filter packages by maintainer email")
