@@ -50,6 +50,8 @@ def parse_cmdline():
                         Negates '--no-version'""")
     parser.add_argument("-m", "--maintainer-email", type=str, default="",
                         help="Filter packages by maintainer email")
+    parser.add_argument("--orphaned", action="store_true",
+                        help="Match only orphaned (maintainer-needed) packages")
 
     return parser.parse_args()
 
@@ -62,6 +64,7 @@ def main():
     no_version = args.no_version
     verbose = args.verbose
     maintainer_regex = re.compile(args.maintainer_email)
+    match_orphaned = args.orphaned
 
     if verbose:
         if no_version:
@@ -79,10 +82,13 @@ def main():
                 s = ""
                 maintainer_match = False
 
-                for m in maintainers:
-                    if maintainer_regex.match(m.email):
-                        maintainer_match = True
-                    s += m.email + " "
+                if bool(maintainers) and match_orphaned:
+                    maintainer_match = True
+                else:
+                    for m in maintainers:
+                        if maintainer_regex.match(m.email):
+                            maintainer_match = True
+                        s += m.email + " "
 
                 if not maintainer_match:
                     continue
