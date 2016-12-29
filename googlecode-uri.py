@@ -18,8 +18,8 @@ def get_cp_all(portdb, portdir):
 def get_cpv_all(portdb, portdir, cp):
     return portdb.cp_list(cp, mytree=portdir)
 
-def get_fetchmap(portdb, atom):
-    return portdb.getFetchMap(atom)
+def get_fetchmap(portdb, portdir, atom):
+    return portdb.getFetchMap(atom, mytree=portdir)
 
 def filter_fetchmap(fetchmap, regex):
     for key in fetchmap:
@@ -87,7 +87,7 @@ def main():
     for cp in cp_list:
         cpv_list = get_cpv_all(portdb, portdir, cp)
         for cpv in cpv_list:
-            fetchmap = filter_fetchmap(get_fetchmap(portdb, cpv), regex)
+            fetchmap = filter_fetchmap(get_fetchmap(portdb, portdir, cpv), regex)
             if (bool(fetchmap)):
                 maintainers = get_maintainers(portdir, cp)
                 s = ""
