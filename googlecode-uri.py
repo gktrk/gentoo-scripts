@@ -37,6 +37,17 @@ def get_maintainers(portdir, atom):
     xml = portage.xml.metadata.MetaDataXML(metadata, None)
     return xml.maintainers()
 
+def match_maintainer(maintainers, maintainer_regex, match_orphaned):
+    if match_orphaned:
+        if not bool(maintainers):
+            return True
+        else:
+            return False
+    else:
+        for m in maintainers:
+            if maintainer_regex.match(m.email):
+                return True
+
 def parse_cmdline():
     parser = argparse.ArgumentParser()
 
@@ -80,18 +91,13 @@ def main():
             if (bool(fetchmap)):
                 maintainers = get_maintainers(portdir, cp)
                 s = ""
-                maintainer_match = False
 
-                if bool(maintainers) and match_orphaned:
-                    maintainer_match = True
+                if not match_maintainer(maintainers, maintainer_regex,
+                                        match_orphaned):
+                    continue
                 else:
                     for m in maintainers:
-                        if maintainer_regex.match(m.email):
-                            maintainer_match = True
                         s += m.email + " "
-
-                if not maintainer_match:
-                    continue
 
                 if no_version:
                     print("{}: {}".format(cp, s))
