@@ -63,12 +63,14 @@ def parse_cmdline():
                         help="Filter packages by maintainer email")
     parser.add_argument("--orphaned", action="store_true",
                         help="Match only orphaned (maintainer-needed) packages")
+    parser.add_argument("--uri-regex", type=str,
+                        default=r"code.google.com|googlecode.com",
+                        help="Regex to match SRC_URI against")
 
     return parser.parse_args()
 
 def main():
     portdb = get_portdb()
-    regex = re.compile(".*(code.google.com|googlecode.com).*")
 
     args = parse_cmdline()
     portdir = args.portdir
@@ -76,6 +78,7 @@ def main():
     verbose = args.verbose
     maintainer_regex = re.compile(args.maintainer_email)
     match_orphaned = args.orphaned
+    regex = re.compile(r".*(" + args.uri_regex + r").*")
 
     if verbose:
         if no_version:
